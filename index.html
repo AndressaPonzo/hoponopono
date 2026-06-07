@@ -4,21 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ho'oponopono · Prática de Cura</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0d0f14;
-    --surface: #13161e;
     --gold: #c9a84c;
     --gold-light: #edd077;
     --gold-dim: #7a6030;
     --sage: #7a9e8a;
     --sky: #6a9ec4;
-    --muted: #6a7080;
-    --text: #e0d8c8;
-    --text-dim: #9a9080;
-    --bead-off: #3a4560;
-    --bead-on: #c9a84c;
+    --muted: #7a8090;
+    --text: #ede5d5;
+    --text-dim: #a09880;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,177 +33,209 @@
 
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background:
-      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%),
       radial-gradient(ellipse 40% 50% at 80% 80%, rgba(106,158,196,0.04) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
   .container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 440px;
-    padding: 18px 14px 36px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    position: relative; z-index: 1;
+    width: 100%; max-width: 430px;
+    padding: 20px 16px 40px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
   }
 
-  /* Header */
-  header {
-    text-align: center;
-    margin-bottom: 12px;
-  }
+  /* ── Header ── */
+  header { text-align: center; margin-bottom: 14px; }
   header h1 {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.5rem, 6vw, 2.1rem);
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--gold-light);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
   }
   header p {
-    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    font-size: 1.05rem;
     color: var(--text-dim);
     font-style: italic;
     margin-top: 4px;
-    letter-spacing: 0.04em;
   }
 
-  /* Toggle button */
+  /* ── Toggle button ── */
   .btn-toggle {
     background: transparent;
     border: 1px solid rgba(201,168,76,0.35);
     color: var(--gold-dim);
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(0.85rem, 3.2vw, 0.95rem);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    padding: 7px 20px;
-    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    padding: 8px 22px;
+    border-radius: 24px;
     cursor: pointer;
     transition: all 0.3s;
     margin-bottom: 10px;
   }
   .btn-toggle:hover { border-color: var(--gold); color: var(--gold); }
 
-  /* Japamala wrapper */
+  /* ── Japamala wrapper ── */
   .japamala-wrapper {
     width: 100%;
-    display: flex;
-    justify-content: center;
+    display: flex; justify-content: center;
     transition: opacity 0.5s, max-height 0.5s;
     overflow: hidden;
-    max-height: 380px;
+    max-height: 340px;
   }
   .japamala-wrapper.hidden {
-    opacity: 0;
-    max-height: 0 !important;
-    pointer-events: none;
+    opacity: 0; max-height: 0 !important; pointer-events: none;
   }
 
   #japamala-svg {
-    width: 100%;
-    max-width: 340px;
-    height: auto;
-    filter: drop-shadow(0 0 16px rgba(201,168,76,0.1));
+    width: 100%; max-width: 310px; height: auto;
+    filter: drop-shadow(0 0 18px rgba(201,168,76,0.12));
   }
 
-  /* Divider */
+  /* ── TAP BUTTON (outside japamala) ── */
+  .btn-tap-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    margin: 14px 0 8px;
+  }
+  .btn-tap {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, #4a5878, #2a3248);
+    border: 2.5px solid rgba(201,168,76,0.5);
+    box-shadow:
+      0 0 0 6px rgba(201,168,76,0.07),
+      0 6px 24px rgba(0,0,0,0.5);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.12s, box-shadow 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-tap:active { transform: scale(0.93); box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+  .btn-tap.on {
+    background: radial-gradient(circle at 38% 36%, #ddb94a, #9a7020);
+    border-color: rgba(237,208,119,0.8);
+    box-shadow:
+      0 0 0 8px rgba(201,168,76,0.12),
+      0 0 28px rgba(201,168,76,0.4),
+      0 6px 24px rgba(0,0,0,0.4);
+  }
+  .btn-tap-inner {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  /* ripple ring */
+  .btn-tap::after {
+    content: '';
+    position: absolute; inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,168,76,0.5);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .btn-tap.ripple::after {
+    animation: ripple-out 0.55s ease-out forwards;
+  }
+  @keyframes ripple-out {
+    0%   { inset: -2px; opacity: 0.7; }
+    100% { inset: -20px; opacity: 0; }
+  }
+  .btn-tap-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  /* ── Divider ── */
   .divider {
-    width: 60px;
-    height: 1px;
+    width: 70px; height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
     margin: 10px auto;
   }
 
-  /* Counter */
+  /* ── Counter ── */
   .counter-display {
     font-family: 'Cinzel', serif;
-    font-size: clamp(2rem, 9vw, 3rem);
+    font-size: 3rem;
+    font-weight: 700;
     color: var(--gold-light);
     letter-spacing: 0.06em;
     text-align: center;
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 6px;
-    margin: 4px 0;
+    display: flex; align-items: baseline;
+    justify-content: center; gap: 8px;
+    margin: 2px 0;
+    line-height: 1;
   }
   .counter-display .of108 {
-    font-size: 0.42em;
+    font-size: 1.1rem;
+    font-weight: 500;
     color: var(--text-dim);
   }
 
-  /* Completion */
+  /* ── Completion ── */
   .completion {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
+    display: none; flex-direction: column;
+    align-items: center; gap: 4px;
     text-align: center;
     animation: fadeIn 0.8s ease;
-    margin: 6px 0;
+    margin: 8px 0 4px;
   }
   .completion.show { display: flex; }
   .completion .msg {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
-    font-weight: 600;
-    color: var(--gold-light);
-    letter-spacing: 0.08em;
+    font-size: 1.35rem; font-weight: 700;
+    color: var(--gold-light); letter-spacing: 0.07em;
   }
   .completion .sub {
-    font-size: clamp(0.9rem, 3.5vw, 1rem);
-    color: var(--sage);
-    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--sage); font-style: italic;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Chrono */
+  /* ── Chrono ── */
   .chrono-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 2px 0 14px;
+    display: flex; flex-direction: column; align-items: center;
+    margin: 4px 0 16px;
   }
   .chrono-label {
-    font-size: clamp(0.72rem, 2.8vw, 0.8rem);
+    font-size: 0.82rem;
     color: var(--muted);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-bottom: 2px;
+    font-weight: 700;
   }
   .chrono {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.1rem, 4.5vw, 1.4rem);
-    color: var(--text-dim);
-    letter-spacing: 0.14em;
+    font-size: 1.35rem; font-weight: 500;
+    color: var(--text-dim); letter-spacing: 0.16em;
   }
 
-  /* Controls */
-  .controls {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-  }
+  /* ── Controls ── */
+  .controls { display: flex; gap: 12px; justify-content: center; }
   .btn {
     font-family: 'Cinzel', serif;
-    font-size: clamp(0.9rem, 3.5vw, 1rem);
-    font-weight: 600;
+    font-size: 1rem; font-weight: 700;
     letter-spacing: 0.1em;
-    padding: 13px 30px;
-    border-radius: 30px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s;
-    min-width: 120px;
+    padding: 14px 30px;
+    border-radius: 30px; border: none;
+    cursor: pointer; transition: all 0.3s;
+    min-width: 126px;
   }
   .btn-iniciar {
     background: linear-gradient(135deg, var(--gold-light), var(--gold-dim));
@@ -214,36 +243,16 @@
     box-shadow: 0 4px 20px rgba(201,168,76,0.3);
   }
   .btn-iniciar:hover:not(.started) {
-    box-shadow: 0 4px 28px rgba(201,168,76,0.5);
+    box-shadow: 0 4px 28px rgba(201,168,76,0.55);
     transform: translateY(-1px);
   }
-  .btn-iniciar.started {
-    opacity: 0.35;
-    cursor: default;
-    transform: none;
-  }
+  .btn-iniciar.started { opacity: 0.32; cursor: default; transform: none; }
   .btn-reiniciar {
     background: transparent;
-    border: 1px solid rgba(106,158,196,0.45);
+    border: 1.5px solid rgba(106,158,196,0.5);
     color: var(--sky);
-    font-size: clamp(0.9rem, 3.5vw, 1rem);
   }
-  .btn-reiniciar:hover {
-    border-color: var(--sky);
-    background: rgba(106,158,196,0.08);
-  }
-
-  /* Touch hint */
-  .touch-hint {
-    font-size: clamp(0.82rem, 3.2vw, 0.9rem);
-    color: var(--muted);
-    font-style: italic;
-    letter-spacing: 0.04em;
-    text-align: center;
-    margin: 4px 0 2px;
-    transition: opacity 0.5s;
-  }
-  .touch-hint.fade { opacity: 0; }
+  .btn-reiniciar:hover { border-color: var(--sky); background: rgba(106,158,196,0.08); }
 </style>
 </head>
 <body>
@@ -256,76 +265,59 @@
 
   <button class="btn-toggle" id="btnToggle" onclick="toggleJapamala()">✦ Ocultar japamala</button>
 
+  <!-- JAPAMALA SVG -->
   <div class="japamala-wrapper" id="japaWrapper">
-    <!-- SVG viewBox: 360x360 -->
-    <svg id="japamala-svg" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+    <svg id="japamala-svg" viewBox="0 0 310 310" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="glow">
           <feGaussianBlur stdDeviation="3" result="cb"/>
           <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
-        <filter id="glowStrong">
-          <feGaussianBlur stdDeviation="5" result="cb"/>
-          <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
       </defs>
-
-      <!-- Outer ring guide -->
-      <circle cx="180" cy="180" r="164" fill="none" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>
-
       <!-- Thread ring -->
-      <circle cx="180" cy="180" r="145" fill="none" stroke="rgba(201,168,76,0.14)" stroke-width="1.5" stroke-dasharray="4 3"/>
-
+      <circle cx="155" cy="155" r="130" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <!-- Outer halo -->
+      <circle cx="155" cy="155" r="148" fill="none" stroke="rgba(201,168,76,0.05)" stroke-width="1"/>
       <!-- Beads -->
       <g id="beads-group"></g>
-
-      <!-- Center mantras text (inside the ring) -->
-      <text x="180" y="148" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="13.5" font-style="italic" fill="rgba(240,232,210,0.82)" letter-spacing="0.5">Sinto muito</text>
-      <text x="180" y="168" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="13.5" font-style="italic" fill="rgba(240,232,210,0.82)" letter-spacing="0.5">Me perdoe</text>
-      <text x="180" y="188" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="13.5" font-style="italic" fill="rgba(240,232,210,0.82)" letter-spacing="0.5">Eu te amo</text>
-      <text x="180" y="208" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="13.5" font-style="italic" fill="rgba(240,232,210,0.82)" letter-spacing="0.5">Sou grato</text>
-
-      <!-- Center decorative line -->
-      <line x1="136" y1="220" x2="224" y2="220" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
-
-      <!-- Sumeru (tap point) — bottom center for thumb comfort on mobile -->
-      <g id="sumeru-group" onclick="tapBead()" style="cursor:pointer">
-        <!-- Halo -->
-        <circle cx="180" cy="338" r="22" fill="rgba(201,168,76,0.06)" stroke="rgba(201,168,76,0.18)" stroke-width="1"/>
-        <!-- Main bead -->
-        <circle id="sumeru" cx="180" cy="338" r="15" fill="#3a4560" stroke="rgba(201,168,76,0.35)" stroke-width="1.5"/>
-        <!-- Inner shine -->
-        <circle cx="175" cy="333" r="4" fill="rgba(255,255,255,0.07)"/>
-        <!-- Ripple indicator -->
-        <circle id="tap-indicator" cx="180" cy="338" r="15" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="1.5" opacity="0"/>
-        <!-- Label -->
-        <text x="180" y="342" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="rgba(201,168,76,0.65)" letter-spacing="1.2">TOQUE</text>
-      </g>
-
-      <!-- Connector thread sumeru to ring -->
-      <line x1="180" y1="323" x2="180" y2="289" stroke="rgba(201,168,76,0.25)" stroke-width="1.5"/>
+      <!-- Center mantras -->
+      <text x="155" y="126" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="15" font-style="italic" font-weight="700" fill="rgba(237,208,119,0.85)">Sinto muito</text>
+      <text x="155" y="148" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="15" font-style="italic" font-weight="700" fill="rgba(237,208,119,0.85)">Me perdoe</text>
+      <text x="155" y="170" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="15" font-style="italic" font-weight="700" fill="rgba(237,208,119,0.85)">Eu te amo</text>
+      <text x="155" y="192" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="15" font-style="italic" font-weight="700" fill="rgba(237,208,119,0.85)">Sou grato</text>
+      <line x1="110" y1="203" x2="200" y2="203" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
     </svg>
   </div>
 
-  <p class="touch-hint" id="touchHint">Toque na conta inferior do japamala para contar</p>
+  <!-- TAP BUTTON — outside japamala, always visible -->
+  <div class="btn-tap-wrap">
+    <button class="btn-tap" id="btnTap" onclick="tapBead()" aria-label="Contar conta do japamala">
+      <div class="btn-tap-inner"></div>
+    </button>
+    <span class="btn-tap-label">Toque para contar</span>
+  </div>
 
   <div class="divider"></div>
 
+  <!-- Counter -->
   <div class="counter-display">
     <span id="countNum">0</span>
     <span class="of108">/ 108</span>
   </div>
 
+  <!-- Completion message -->
   <div class="completion" id="completion">
     <div class="msg">Concluído — Gratidão 🙏</div>
     <div class="sub">108 intenções enviadas ao universo</div>
   </div>
 
+  <!-- Chrono -->
   <div class="chrono-area">
     <div class="chrono-label">Tempo de prática</div>
     <div class="chrono" id="chrono">00:00</div>
   </div>
 
+  <!-- Control buttons -->
   <div class="controls">
     <button class="btn btn-iniciar" id="btnIniciar" onclick="iniciar()">Iniciar</button>
     <button class="btn btn-reiniciar" onclick="reiniciar()">Reiniciar</button>
@@ -334,28 +326,23 @@
 </div>
 <script>
 const TOTAL = 108;
-const CX = 180, CY = 180, RADIUS = 145, BEAD_R = 8.5;
-let count = 0, started = false, finished = false;
-let japaVisible = true, chronoInterval = null, chronoSec = 0;
-let hintFaded = false;
-
-// Instant color: off = slate, on = gold
+const CX = 155, CY = 155, RADIUS = 130, BEAD_R = 7.5;
 const COLOR_OFF = '#3a4560';
 const COLOR_ON  = '#c9a84c';
+
+let count = 0, started = false, finished = false;
+let japaVisible = true, chronoInterval = null, chronoSec = 0;
 
 function buildBeads() {
   const g = document.getElementById('beads-group');
   g.innerHTML = '';
   for (let i = 0; i < TOTAL; i++) {
-    // Start just after sumeru at bottom, go clockwise
-    // Sumeru is at bottom (270° = bottom = +π/2)
-    // Skip the bottom slot (sumeru), offset beads slightly
-    const angle = ((i / TOTAL) * 2 * Math.PI) + (Math.PI / 2) + (2 * Math.PI / TOTAL / 2);
+    // Distribute evenly starting from top, slight offset so no bead exactly at 12 o'clock
+    const angle = (i / TOTAL) * 2 * Math.PI - Math.PI / 2 + (Math.PI / TOTAL);
     const x = (CX + RADIUS * Math.cos(angle)).toFixed(2);
     const y = (CY + RADIUS * Math.sin(angle)).toFixed(2);
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    c.setAttribute('cx', x);
-    c.setAttribute('cy', y);
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
     c.setAttribute('r', BEAD_R);
     c.setAttribute('fill', COLOR_OFF);
     c.setAttribute('stroke', 'rgba(201,168,76,0.12)');
@@ -371,9 +358,10 @@ function updateBeads() {
     if (!el) continue;
     if (i < count) {
       el.setAttribute('fill', COLOR_ON);
-      el.setAttribute('stroke', i === count - 1 ? 'rgba(201,168,76,0.7)' : 'rgba(201,168,76,0.3)');
-      el.setAttribute('stroke-width', i === count - 1 ? '1.8' : '0.8');
-      el.setAttribute('filter', i === count - 1 ? 'url(#glow)' : '');
+      el.setAttribute('stroke', i === count - 1 ? 'rgba(237,208,119,0.8)' : 'rgba(201,168,76,0.3)');
+      el.setAttribute('stroke-width', i === count - 1 ? '2' : '0.8');
+      if (i === count - 1) el.setAttribute('filter', 'url(#glow)');
+      else el.removeAttribute('filter');
     } else {
       el.setAttribute('fill', COLOR_OFF);
       el.setAttribute('stroke', 'rgba(201,168,76,0.12)');
@@ -381,11 +369,11 @@ function updateBeads() {
       el.removeAttribute('filter');
     }
   }
-  // Sumeru
-  const sumeru = document.getElementById('sumeru');
-  sumeru.setAttribute('fill', count > 0 ? COLOR_ON : COLOR_OFF);
-  if (count > 0) sumeru.setAttribute('filter', 'url(#glowStrong)');
-  else sumeru.removeAttribute('filter');
+  // Tap button gold state
+  const btn = document.getElementById('btnTap');
+  if (count > 0 && !finished) btn.classList.add('on');
+  else if (finished) btn.classList.add('on');
+  else btn.classList.remove('on');
 }
 
 function tapBead() {
@@ -393,26 +381,12 @@ function tapBead() {
   count++;
   document.getElementById('countNum').textContent = count;
   updateBeads();
-  animateRipple();
-  if (!hintFaded) {
-    document.getElementById('touchHint').classList.add('fade');
-    hintFaded = true;
-  }
+  // Ripple animation on button
+  const btn = document.getElementById('btnTap');
+  btn.classList.remove('ripple');
+  void btn.offsetWidth; // reflow
+  btn.classList.add('ripple');
   if (count >= TOTAL) finishPractice();
-}
-
-function animateRipple() {
-  const el = document.getElementById('tap-indicator');
-  let start = null;
-  function step(ts) {
-    if (!start) start = ts;
-    const p = Math.min((ts - start) / 550, 1);
-    el.setAttribute('r', 15 + p * 18);
-    el.setAttribute('opacity', 0.75 * (1 - p));
-    if (p < 1) requestAnimationFrame(step);
-    else el.setAttribute('opacity', '0');
-  }
-  requestAnimationFrame(step);
 }
 
 function iniciar() {
@@ -421,8 +395,8 @@ function iniciar() {
   document.getElementById('btnIniciar').classList.add('started');
   chronoInterval = setInterval(() => {
     chronoSec++;
-    const m = String(Math.floor(chronoSec / 60)).padStart(2,'0');
-    const s = String(chronoSec % 60).padStart(2,'0');
+    const m = String(Math.floor(chronoSec / 60)).padStart(2, '0');
+    const s = String(chronoSec % 60).padStart(2, '0');
     document.getElementById('chrono').textContent = `${m}:${s}`;
   }, 1000);
 }
@@ -430,12 +404,11 @@ function iniciar() {
 function reiniciar() {
   count = 0; started = false; finished = false;
   clearInterval(chronoInterval); chronoInterval = null; chronoSec = 0;
-  hintFaded = false;
   document.getElementById('chrono').textContent = '00:00';
   document.getElementById('countNum').textContent = '0';
   document.getElementById('completion').classList.remove('show');
   document.getElementById('btnIniciar').classList.remove('started');
-  document.getElementById('touchHint').classList.remove('fade');
+  document.getElementById('btnTap').classList.remove('on', 'ripple');
   buildBeads(); updateBeads();
 }
 
@@ -453,7 +426,7 @@ function toggleJapamala() {
   const b = document.getElementById('btnToggle');
   if (japaVisible) {
     w.classList.remove('hidden');
-    w.style.maxHeight = '380px';
+    w.style.maxHeight = '340px';
     b.textContent = '✦ Ocultar japamala';
   } else {
     w.classList.add('hidden');
