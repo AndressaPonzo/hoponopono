@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ho'oponopono · Prática de Cura</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a6030;
+    --pearl: #f0ead8;
+    --sage: #7a9e8a;
+    --lotus: #c4738a;
+    --sky: #6a9ec4;
+    --muted: #5a6070;
+    --text: #d8d0c0;
+    --text-dim: #807868;
+    --bead-start: #3a4560;
+    --bead-done: #c9a84c;
+    --bead-active: #e8d090;
+    --radius: 50%;
+    --transition: 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* Background atmosphere */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 80% 80%, rgba(106,158,196,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 20% 70%, rgba(196,115,138,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: 400;
+    color: var(--gold-light);
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+  }
+  header p {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Mantras */
+  .mantras {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    text-align: center;
+  }
+  .mantra-line {
+    font-size: clamp(0.85rem, 3.5vw, 1rem);
+    color: var(--pearl);
+    line-height: 2;
+    letter-spacing: 0.03em;
+  }
+  .mantra-line span {
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  /* Toggle japamala button */
+  .btn-toggle {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold-dim);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    padding: 6px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 14px;
+  }
+  .btn-toggle:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Japamala wrapper */
+  .japamala-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+    transition: opacity 0.5s, max-height 0.5s;
+    overflow: hidden;
+  }
+  .japamala-wrapper.hidden {
+    opacity: 0;
+    max-height: 0 !important;
+    pointer-events: none;
+  }
+
+  /* SVG canvas */
+  #japamala-svg {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    cursor: pointer;
+    filter: drop-shadow(0 0 18px rgba(201,168,76,0.08));
+  }
+
+  /* Touch hint */
+  .touch-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-style: italic;
+    letter-spacing: 0.05em;
+    text-align: center;
+    margin-bottom: 6px;
+    transition: opacity 0.3s;
+  }
+  .touch-hint.fade { opacity: 0; }
+
+  /* Counter display */
+  .counter-display {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 7vw, 2.6rem);
+    color: var(--gold-light);
+    letter-spacing: 0.06em;
+    margin: 8px 0 2px;
+    text-align: center;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .counter-display .of108 {
+    font-size: 0.45em;
+    color: var(--text-dim);
+    align-self: flex-end;
+    margin-bottom: 4px;
+  }
+
+  /* Completion message */
+  .completion {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+    margin: 4px 0 8px;
+  }
+  .completion.show { display: flex; }
+  .completion .msg {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+  }
+  .completion .sub {
+    font-size: 0.85rem;
+    color: var(--sage);
+    font-style: italic;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Chronometer */
+  .chrono-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 6px 0 18px;
+  }
+  .chrono-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .chrono {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+  }
+
+  /* Control buttons */
+  .controls {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    padding: 12px 32px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 130px;
+  }
+  .btn-iniciar {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #0d0f14;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+  .btn-iniciar:hover:not(:disabled) {
+    box-shadow: 0 4px 28px rgba(201,168,76,0.5);
+    transform: translateY(-1px);
+  }
+  .btn-iniciar.started {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .btn-reiniciar {
+    background: transparent;
+    border: 1px solid rgba(106,158,196,0.4);
+    color: var(--sky);
+  }
+  .btn-reiniciar:hover {
+    border-color: var(--sky);
+    background: rgba(106,158,196,0.08);
+  }
+
+  /* Divider */
+  .divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 16px auto;
+  }
+
+  /* Ripple on tap zone */
+  .tap-zone {
+    cursor: pointer;
+  }
+
+  @keyframes ripple {
+    0% { opacity: 0.6; r: 10; }
+    100% { opacity: 0; r: 28; }
+  }
+  .ripple-anim { animation: ripple 0.5s ease-out forwards; }
+
+  @media (max-width: 360px) {
+    .container { padding: 16px 10px 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Ho'oponopono</h1>
+    <p>Prática sagrada de cura e reconciliação</p>
+  </header>
+
+  <div class="mantras">
+    <div class="mantra-line"><span>Sinto muito</span></div>
+    <div class="mantra-line"><span>Me perdoe</span></div>
+    <div class="mantra-line"><span>Eu te amo</span></div>
+    <div class="mantra-line"><span>Sou grato</span></div>
+  </div>
+
+  <button class="btn-toggle" id="btnToggle" onclick="toggleJapamala()">✦ Ocultar japamala</button>
+
+  <div class="japamala-wrapper" id="japaWrapper">
+    <svg id="japamala-svg" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#1a1e2a"/>
+          <stop offset="100%" stop-color="#0d0f14"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glowStrong">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Background circle subtle -->
+      <circle cx="180" cy="180" r="165" fill="none" stroke="rgba(201,168,76,0.06)" stroke-width="1"/>
+
+      <!-- Thread path (decorative) -->
+      <circle id="thread-ring" cx="180" cy="180" r="145" fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+      <!-- Beads group -->
+      <g id="beads-group"></g>
+
+      <!-- Sumeru bead (top, larger) -->
+      <g id="sumeru-group" class="tap-zone" onclick="tapBead()">
+        <circle id="sumeru-bg" cx="180" cy="22" r="18" fill="#1a1e2a" stroke="rgba(201,168,76,0.3)" stroke-width="1.5"/>
+        <circle id="sumeru" cx="180" cy="22" r="14" fill="#3a4560"/>
+        <circle cx="180" cy="22" r="6" fill="rgba(201,168,76,0.15)"/>
+        <!-- tap indicator -->
+        <circle id="tap-indicator" cx="180" cy="22" r="22" fill="none" stroke="rgba(201,168,76,0.5)" stroke-width="1.5" opacity="0"/>
+        <!-- TAP text -->
+        <text x="180" y="27" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="rgba(201,168,76,0.6)" letter-spacing="1">TOQUE</text>
+      </g>
+
+      <!-- Tassel -->
+      <g id="tassel">
+        <line x1="180" y1="36" x2="180" y2="52" stroke="rgba(201,168,76,0.4)" stroke-width="1.5"/>
+        <line x1="175" y1="52" x2="172" y2="64" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="180" y1="52" x2="180" y2="66" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        <line x1="185" y1="52" x2="188" y2="64" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="touch-hint" id="touchHint">Toque no centro do japamala para contar</p>
+
+  <div class="divider"></div>
+
+  <div class="counter-display" id="counterDisplay">
+    <span id="countNum">0</span>
+    <span class="of108">/ 108</span>
+  </div>
+
+  <div class="completion" id="completion">
+    <div class="msg">Concluído — Gratidão 🙏</div>
+    <div class="sub">108 intenções enviadas ao universo</div>
+  </div>
+
+  <div class="chrono-area">
+    <div class="chrono-label">Tempo de prática</div>
+    <div class="chrono" id="chrono">00:00</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-iniciar" id="btnIniciar" onclick="iniciar()">Iniciar</button>
+    <button class="btn btn-reiniciar" onclick="reiniciar()">Reiniciar</button>
+  </div>
+
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+let count = 0;
+let started = false;
+let finished = false;
+let japaVisible = true;
+let chronoInterval = null;
+let chronoSec = 0;
+const TOTAL = 108;
+
+// Color gradient: deep slate → warm gold
+function beadColor(index) {
+  // 0 = untouched (slate blue), index = filled (gold)
+  const t = index / TOTAL;
+  const r = Math.round(58  + (201 - 58)  * t);
+  const g = Math.round(69  + (168 - 69)  * t);
+  const b = Math.round(96  + (76  - 96)  * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+// ─── Build beads ─────────────────────────────────────────
+const BEAD_COUNT = 108;
+const CX = 180, CY = 180, RADIUS = 145;
+const BEAD_R = 8.5;
+
+function buildBeads() {
+  const g = document.getElementById('beads-group');
+  g.innerHTML = '';
+  for (let i = 0; i < BEAD_COUNT; i++) {
+    // Start from top (sumeru at 270° = top), go clockwise
+    const angle = ((i / BEAD_COUNT) * 2 * Math.PI) - Math.PI / 2;
+    const x = CX + RADIUS * Math.cos(angle);
+    const y = CY + RADIUS * Math.sin(angle);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x.toFixed(2));
+    circle.setAttribute('cy', y.toFixed(2));
+    circle.setAttribute('r', BEAD_R);
+    circle.setAttribute('fill', '#3a4560');
+    circle.setAttribute('stroke', 'rgba(201,168,76,0.12)');
+    circle.setAttribute('stroke-width', '0.8');
+    circle.setAttribute('id', `bead-${i}`);
+    circle.style.transition = 'fill 0.5s ease';
+    g.appendChild(circle);
+  }
+}
+
+function updateBeads() {
+  for (let i = 0; i < BEAD_COUNT; i++) {
+    const el = document.getElementById(`bead-${i}`);
+    if (!el) continue;
+    if (i < count) {
+      el.setAttribute('fill', beadColor(i + 1));
+      el.setAttribute('filter', i === count - 1 ? 'url(#glow)' : '');
+      el.setAttribute('stroke', i === count - 1 ? 'rgba(201,168,76,0.6)' : 'rgba(201,168,76,0.18)');
+      el.setAttribute('stroke-width', i === count - 1 ? '1.5' : '0.8');
+    } else {
+      el.setAttribute('fill', '#3a4560');
+      el.setAttribute('filter', '');
+      el.setAttribute('stroke', 'rgba(201,168,76,0.12)');
+      el.setAttribute('stroke-width', '0.8');
+    }
+  }
+  // Update sumeru color
+  const sumeru = document.getElementById('sumeru');
+  if (count > 0) {
+    sumeru.setAttribute('fill', beadColor(count));
+    sumeru.setAttribute('filter', 'url(#glowStrong)');
+  } else {
+    sumeru.setAttribute('fill', '#3a4560');
+    sumeru.removeAttribute('filter');
+  }
+}
+
+// ─── Tap bead ─────────────────────────────────────────────
+function tapBead() {
+  if (!started || finished) return;
+
+  count++;
+  document.getElementById('countNum').textContent = count;
+  updateBeads();
+  animateTapIndicator();
+  hideTouchHint();
+
+  if (count >= TOTAL) {
+    finishPractice();
+  }
+}
+
+function animateTapIndicator() {
+  const el = document.getElementById('tap-indicator');
+  el.setAttribute('opacity', '0.7');
+  el.setAttribute('r', '18');
+  // Animate via JS
+  let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const p = (ts - start) / 500;
+    if (p < 1) {
+      el.setAttribute('r', 18 + p * 16);
+      el.setAttribute('opacity', 0.7 * (1 - p));
+      requestAnimationFrame(step);
+    } else {
+      el.setAttribute('opacity', '0');
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ─── Controls ────────────────────────────────────────────
+function iniciar() {
+  if (started) return;
+  started = true;
+  finished = false;
+  document.getElementById('btnIniciar').classList.add('started');
+  startChrono();
+}
+
+function reiniciar() {
+  count = 0;
+  started = false;
+  finished = false;
+  clearInterval(chronoInterval);
+  chronoInterval = null;
+  chronoSec = 0;
+  document.getElementById('chrono').textContent = '00:00';
+  document.getElementById('countNum').textContent = '0';
+  document.getElementById('completion').classList.remove('show');
+  document.getElementById('btnIniciar').classList.remove('started');
+  document.getElementById('touchHint').classList.remove('fade');
+  buildBeads();
+  updateBeads();
+}
+
+function finishPractice() {
+  finished = true;
+  started = false;
+  clearInterval(chronoInterval);
+  chronoInterval = null;
+  document.getElementById('btnIniciar').classList.remove('started');
+  document.getElementById('completion').classList.add('show');
+  // Glow all beads gold
+  updateBeads();
+}
+
+// ─── Chrono ───────────────────────────────────────────────
+function startChrono() {
+  chronoInterval = setInterval(() => {
+    chronoSec++;
+    const m = String(Math.floor(chronoSec / 60)).padStart(2, '0');
+    const s = String(chronoSec % 60).padStart(2, '0');
+    document.getElementById('chrono').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+// ─── Toggle japamala ──────────────────────────────────────
+function toggleJapamala() {
+  japaVisible = !japaVisible;
+  const wrapper = document.getElementById('japaWrapper');
+  const btn = document.getElementById('btnToggle');
+  if (japaVisible) {
+    wrapper.classList.remove('hidden');
+    wrapper.style.maxHeight = '400px';
+    btn.textContent = '✦ Ocultar japamala';
+  } else {
+    wrapper.classList.add('hidden');
+    btn.textContent = '✦ Mostrar japamala';
+  }
+}
+
+// ─── Touch hint ───────────────────────────────────────────
+let hintFaded = false;
+function hideTouchHint() {
+  if (!hintFaded) {
+    document.getElementById('touchHint').classList.add('fade');
+    hintFaded = true;
+  }
+}
+
+// ─── SVG tap zone also for mobile ─────────────────────────
+document.getElementById('japamala-svg').addEventListener('click', function(e) {
+  // Only tap if clicking sumeru group area
+  // (handled by onclick on group already)
+});
+
+// ─── Init ─────────────────────────────────────────────────
+buildBeads();
+updateBeads();
+
+// Wrapper initial max-height
+document.getElementById('japaWrapper').style.maxHeight = '400px';
+</script>
+</body>
+</html>
